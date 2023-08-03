@@ -18,7 +18,7 @@
         HTML/CSS
         JS ES6
 
-# 1 Basic static web pages
+# Basics
 
     learning basic syntax
     learn to "think in react"
@@ -27,3 +27,8 @@
     What is JSX ?
     Custom components
     Styling
+
+# WHY React ?
+
+    It is composable !
+    It is declarative !
