@@ -51,4 +51,5 @@
 
 # Custom components
 
-    
+    Functional Components - functions that return JSX and
+    follows convention - PascalConvention, <Component /> tag
