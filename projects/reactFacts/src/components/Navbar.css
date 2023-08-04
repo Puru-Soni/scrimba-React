@@ -1,0 +1,42 @@
+.nav {
+	width: 654px;
+	height: 91px;
+	padding: 32px 27px; /* top-bottom left-right */
+	background-color: #21222a;
+
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.nav-img {
+	width: 29px;
+	height: 29px;
+	margin-right: 7px;
+}
+
+.nav-logo,
+.nav-text {
+	margin: 0;
+}
+
+.nav-logo {
+	width: 122.394px;
+	height: 22.253px;
+	margin-right: auto;
+
+	color: #61dafb;
+	font-size: 22.253px;
+	font-weight: 700;
+	letter-spacing: -1.113px;
+}
+
+.nav-text {
+	width: 259px;
+	height: 21px;
+
+	color: #deebf8;
+	text-align: right;
+	font-size: 16px;
+	font-weight: 600;
+}
