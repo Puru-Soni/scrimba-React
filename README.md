@@ -53,3 +53,9 @@
 
     Functional Components - functions that return JSX and
     follows convention - PascalConvention, <Component /> tag
+
+# data-driven react
+
+    clone airbnb
+    props in react
+    components from array
