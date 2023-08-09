@@ -26,7 +26,8 @@
 .hero {
 	/* width: 550px; */
 	/* height: 853px; */
-	margin: 50px;
+	margin-left: 50px;
+	margin-top: 20px;
 	display: flex;
 	flex-direction: column;
 }
@@ -51,4 +52,80 @@
 	color: #222;
 	font-weight: 300;
 	line-height: 110%; /* 17.6px */
+}
+
+/* 
+	Card component -------------------------------------------------------------------------------------------------------------
+*/
+
+.card {
+	margin: 10px;
+	display: flex;
+	flex-direction: column;
+}
+
+.card-image {
+	position: relative;
+}
+
+.card-image > img {
+	width: 176px;
+	height: 235px;
+	border-radius: 9px;
+}
+
+.card-status {
+	position: absolute;
+	margin: 6px;
+}
+
+.card-content {
+	width: 176px;
+	height: 58px;
+}
+
+.card-text {
+	color: #222;
+	font-size: 12px;
+	font-weight: 300;
+	line-height: 110%; /* 13.2px */
+}
+
+.card-rating {
+	text-align: left;
+}
+
+.card-rating > p {
+	display: inline;
+	color: #222;
+	font-size: 12px;
+	font-weight: 300;
+	line-height: 110%; /* 13.2px */
+}
+
+.card-rating > img {
+	display: inline;
+	width: 14px;
+	height: 14px;
+}
+
+.card-rating > p > span {
+	color: #918e9b;
+	font-size: 12px;
+	font-weight: 300;
+	line-height: 110%; /* 13.2px */
+}
+
+.card-cost {
+	color: #222;
+	font-size: 12px;
+	font-weight: 600;
+	line-height: 110%; /* 13.2px */
+}
+
+.card-cost > span {
+	color: #222;
+	font-size: 12px;
+	font-weight: 300;
+	line-height: 110%;
 }
