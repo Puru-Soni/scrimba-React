@@ -1,20 +1,28 @@
 import React from "react";
-import starIcon from "../images/star.png";
 
-const Card = ({ img, rating, reviewCount, country, title, price }) => {
+export default function Card({
+	coverImg: img,
+	stats,
+	location,
+	title,
+	price,
+	openSpots,
+}) {
+	let badgeText =
+		openSpots === 0 ? "SOLD OUT" : location === "Online" ? "ONLINE" : "";
 	return (
 		<div className="card">
 			<div className="card-image">
-				<button className="card-status">SOLD OUT</button>
-				<img src={`../images/${img}`} />
+				{badgeText && <button className="card-status">{badgeText}</button>}
+				<img src={`public/images/${img}`} />
 			</div>
 			<div className="card-content">
 				<div className="card-rating">
-					<img src={starIcon} />
+					<img src="public/images/star.png" />
 					<p>
-						{rating}{" "}
+						{stats.rating}{" "}
 						<span>
-							({reviewCount}).{country}
+							({stats.reviewCount})•{location}
 						</span>
 					</p>
 				</div>
@@ -25,6 +33,4 @@ const Card = ({ img, rating, reviewCount, country, title, price }) => {
 			</div>
 		</div>
 	);
-};
-
-export default Card;
+}

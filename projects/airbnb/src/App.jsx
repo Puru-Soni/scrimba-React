@@ -3,27 +3,16 @@ import Navbar from "./components/Navbar";
 import "./App.css";
 import Hero from "./components/Hero";
 import Card from "./components/Card";
-
-// - img ("katie-zaferes.png")
-// - rating ("5.0")
-// - reviewCount (6)
-// - country (Whatever you want)
-// - title ("Life Lessons with Katie Zaferes")
-// - price (136)
+import cardData from "./data";
 
 const App = () => {
+	const cards = cardData.map((item, i) => <Card key={i} {...item} />);
+
 	return (
 		<div className="app">
 			<Navbar />
-			{/* <Hero /> */}
-			<Card
-				img="katiezaferes.png"
-				rating="5.0"
-				reviewCount={6}
-				country="USA"
-				title="Life Lessons with Katie Zaferes"
-				price={136}
-			/>
+			<Hero />
+			<section className="cards-list">{cards}</section>
 		</div>
 	);
 };

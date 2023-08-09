@@ -33,8 +33,7 @@
 }
 
 .hero-photo-grid {
-	min-width: 550px;
-	max-width: 850px;
+	width: 450px;
 	/* height: 853px; */
 	align-self: center;
 }
@@ -59,7 +58,10 @@
 */
 
 .card {
-	margin: 10px;
+	height: 320px;
+	width: 175px;
+	font-size: 12px;
+	flex: 0 0 auto;
 	display: flex;
 	flex-direction: column;
 }
@@ -75,6 +77,14 @@
 }
 
 .card-status {
+	height: 20px;
+
+	color: #222;
+	text-align: center;
+	font-size: 10.24px;
+	font-weight: 400;
+	line-height: 110%; /* 11.264px */
+
 	position: absolute;
 	margin: 6px;
 }
@@ -128,4 +138,20 @@
 	font-size: 12px;
 	font-weight: 300;
 	line-height: 110%;
+}
+
+/* App component */
+
+.cards-list {
+	margin-top: 30px;
+	margin-left: 50px;
+	display: flex;
+	flex-wrap: nowrap;
+	gap: 20px;
+	overflow-x: auto;
+}
+
+.app {
+	margin: 0 auto;
+	width: 700px;
 }
