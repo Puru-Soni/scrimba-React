@@ -84,5 +84,36 @@
 	font-family: Karla;
 	font-size: 16px;
 	font-weight: 700;
-	letter-spacing: -1.6px;
+}
+
+.meme {
+	position: relative;
+	padding-top: 36px;
+	border-radius: 2px;
+}
+
+.meme-text {
+	position: absolute;
+	margin: 0;
+	top: 36px;
+
+	width: 477px;
+	height: 268px;
+
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+	align-items: center;
+
+	color: #fff;
+	font-family: "Bungee Shade", cursive;
+	font-size: 32px;
+	font-style: normal;
+	font-weight: 900;
+	line-height: normal;
+}
+
+.top-text,
+.bottom-text {
+	margin: 0;
 }
