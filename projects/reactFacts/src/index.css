@@ -3,6 +3,7 @@
 }
 
 body {
-	margin: 0;
+	width: 654px;
+	margin: 0 auto;
 	font-family: Inter, sans-serif;
 }
