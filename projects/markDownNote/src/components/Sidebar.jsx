@@ -22,7 +22,10 @@ export default function Sidebar(props) {
 				<button
 					className="delete-btn"
 					// Your onClick event handler here
-					onClick={() => props.deleteNote(event, note.id)}
+					// onClick={(event) => props.deleteNote(event, note.id)}
+
+					//firebase
+					onClick={() => props.deleteNote(note.id)}
 				>
 					<i className="gg-trash trash-icon"></i>
 				</button>

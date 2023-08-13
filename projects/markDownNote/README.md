@@ -19,3 +19,16 @@
 3. Move modified notes to the top of the list : App.jsx
 
 4. delete notes : App.jsx
+
+# Adding Firebase to the project
+
+Setup firebase config and initialise the app
+Create a instance of database and setup a collection
+
+Use firestore function - onSnapshot to add a listner for database to sync with local states
+Firestore databse overwrite ID for each document
+
+onSnapshot - listener
+addDoc - create a document with a parameters : instance of collection, new document {promise}
+doc - gets a specific document, parameters : instance of database, collection name, document id
+deleteDoc - deletes a document in the firestore database, parameter : document ref {promise}
