@@ -48,7 +48,6 @@
     - if another request happens within the specified delay time, then cancel the prev request and set up a new delay for the new request.
 
     Implementation:
-    - remove connection between editor component and app component for making request to firestore
-    {
-      
-    }
+    - remove connection of updating database between editor and app - for making request to firestore
+    - setup a useState state of keeping track of body of note
+    - using setTimeout with useEffect to handle debouncing
