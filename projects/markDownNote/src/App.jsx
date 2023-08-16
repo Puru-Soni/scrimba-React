@@ -2,26 +2,19 @@ import React from "react";
 import Sidebar from "./components/Sidebar";
 import Editor from "./components/Editor";
 import Split from "react-split";
-/*
-	When we send signals to firebase database to update, delete or create a new note in database
-	thier is a chance that the notes state is updated or deleted localally but the request send to
-	the firebase is failed and the states are unsynced hecnce this issue is resolved by using onSnapShot
 
-	This function will act as a listener and when database is update it sends a signal to make the changes
-	locally as well to maintain the states in sync, if there is failure this function never run snice thier was no 
-	change in the firebase database
-*/
-// firestore listner, add a document, get a document, delete a document
-import { onSnapshot, addDoc, doc, deleteDoc } from "firebase/firestore";
+// firestore listner, add, get, delete, update a document
+import { onSnapshot, addDoc, doc, deleteDoc, setDoc } from "firebase/firestore";
 import { notesColection, db } from "./firebase";
 
 export default function App() {
-	/*
-		FEATURE 1
+	const [notes, setNotes] = React.useState([]);
+	const [currentNoteId, setCurrentNoteId] = React.useState("");
+	const [tempNoteText, setTempNoteText] = React.useState("");
 
-	* 	If notes array already exists in localStorage we will get that and update the localStorage maintained 
-		by useEffect hook
-
+	/* FEATURE 1 - connect to localstorage
+	* 	If notes array already exists in localStorage fetch that or update the localStorage on notes state change by useEffect hook
+   
 	*	Arrow function to initialize notes useState because when notes state is updated the App component is 
 		re-rendered hence all code in App componenet is re-executed by react and some code inside useState() 
 		e.g. console.log("hello") will re-run, similar to localstorage.getItem("key") so, we Lazily initialize 
@@ -30,63 +23,108 @@ export default function App() {
 		const [notes, setNotes] = React.useState(
 			() => JSON.parse(localStorage.getItem("notes")) || [],
 		);
-	*/
-
-	// firebase
-	const [notes, setNotes] = React.useState([]);
-
-	// ?. => notes[0] && notes[0].id
-	const [currentNoteId, setCurrentNoteId] = React.useState(notes[0]?.id || "");
-
-	// Refactor of findCurrentNote() function
-	const currentNote =
-		notes.find((note) => note.id === currentNoteId) || notes[0];
-
-	/*
-		FEATURE 1
 
 	*	Intract with localStorage -> 
 		setItem when component is rendered first time and React.useEffect will sync notes state with localStorage
 
-		//code
+		React.useEffect(() => { localStorage.setItem("notes", JSON.stringify(notes)) }, [notes]);
+	*/
+	/* FACT
+		?. => notes[0] && notes[0].id
+	   	const [currentNoteId, setCurrentNoteId] = React.useState(note[0]?.id || "");
+			  
+	 	Since when component is rendered first time, notes is [empty] so currentNoteId is "", hence we are updating 
+		notes array by firebase in useEffect, we will also update currentNoteId
 
-		React.useEffect(() => {
-			localStorage.setItem("notes", JSON.stringify(notes));
-		}, [notes]);
+		When we send signals to firebase database to update, delete or create a new note in database
+		thier is a chance that the notes state is updated or deleted localally but the request send to
+		the firebase is failed and the states are unsynced hecnce this issue is resolved by using onSnapShot
+
+		This function will act as a listener and when database is update it sends a signal to make the changes
+		locally as well to maintain the states in sync, if there is failure this function never run snice thier was no 
+		change in the firebase database
+		
+	  ONSNAPSHOT
+		callback function - called whenever the notesCollecton is changed
+		onSnapshot return a unsubscibe function to remove listener when component is unmounted
 	*/
 
-	// Snice we are using firebase:
+	// initial - undefined
+	const currentNote =
+		notes.find((note) => note.id === currentNoteId) || notes[0];
+
+	// ---------------------------------------------------------------------------------------------------------------------
+
 	React.useEffect(() => {
-		// onshapshot - callback function is called whenever the notesCollecton is changed
-		// also handle this listener when component is unmounted so onSnapshot return a unsubscibe function
 		const unsubscribe = onSnapshot(notesColection, function (snapshot) {
-			// sync up our local notes array with the snapshot data
+			// any update in notes collection in firestore triggers this listener
 			const notesArr = snapshot.docs.map((doc) => ({
-				...doc.data(), //body
+				...doc.data(), // body, updatedAt, createdAt
 				id: doc.id,
 			}));
 			setNotes(notesArr);
 		});
-
-		// cancle the snapshot listener on component unmount
 		return unsubscribe;
 	}, []);
 
+	// initial, currentNoteId = undefined, when first note is created it then assigned to that note.id
+	React.useEffect(() => {
+		if (!currentNoteId) {
+			setCurrentNoteId(notes[0]?.id);
+		}
+	}, [notes]);
+
+	/*
+		Whenever we switch between different notes we need to set tempNoteText to current note body from database
+		so when currentNote change depending on changing of currentNoteId state, it get updated
+	*/
+	React.useEffect(() => {
+		currentNote && setTempNoteText(currentNote.body);
+	}, [currentNote]);
+
+	/*
+		Effect that runs any time the tempNoteText changes, Delay the sending of the request to Firebase
+		using setTimeout, use clearTimeout to cancel the timeout
+	*/
+	React.useEffect(() => {
+		const timeoutId = setTimeout(() => {
+			// not updating order of notes just by clicking on the note
+			tempNoteText !== currentNote.body && updateNote(tempNoteText);
+		}, 500);
+		return () => clearTimeout(timeoutId);
+	}, [tempNoteText]);
+
+	// ---------------------------------------------------------------------------------------------------------------------
 	async function createNewNote() {
-		// id is auto setup by firebase database
+		// when add icon is clicked new Note is created first in the firestore
 		const newNote = {
 			body: "# Type your markdown note's title here",
+			createdAt: Date.now(),
+			updatedAt: Date.now(),
 		};
 		const newNoteRef = await addDoc(notesColection, newNote); // returns a promise
 		setCurrentNoteId(newNoteRef.id);
 	}
 
-	/* 
-		FEATURE 3
+	const sortedNotes = notes.sort((a, b) => b.updatedAt - a.updatedAt);
 
-		Put the most recently-modified note at the top of notes array
-	*/
-	function updateNote(text) {
+	async function updateNote(text) {
+		const docRef = doc(db, "notes", currentNoteId);
+		await setDoc(
+			docRef,
+			{ body: text, updatedAt: Date.now() },
+			{ merge: true },
+		);
+	}
+
+	async function deleteNote(noteId) {
+		const docRef = doc(db, "notes", noteId); // return documentRef
+		await deleteDoc(docRef); // returns a promise
+	}
+
+	/* FEATURE 3 - Put the most recently-modified note at the top of notes array
+	
+		function updateNote(text) {
 		setNotes((oldNotes) => {
 			const newArray = [];
 			oldNotes.forEach((oldNote) => {
@@ -96,64 +134,39 @@ export default function App() {
 			});
 			return newArray;
 		});
-	}
 
-	// Refactored to CurrentNode variable
-	/*
-		function findCurrentNote() {
-			return (
-				notes.find((note) => {
-					return note.id === currentNoteId;
-				}) || notes[0]
-			);
-		}
-	*/
-
-	/*
-		FEATURE 4
-
-	*	Delete a note when click on the trash icon, using Array.filter() 
+	  FEATURE 4 - Delete a note
 		
-	*	Cant use CurrentNodeId because when we click on trash icon, Event bubbling occurs as thier is 
-		onClick property on each Note element as well, and to stop its eventListener we use 
-		event.stopPropagation().
+	*	When we click on trash icon, that might not be the current active Note, currentNoteId will be irrespective 
+		of onClick property on Note to be deleted so pass Note Id parameter to delete func 
 
-	*	So, we Note element is note selected or not the current Note we will get wrong CurrentNodeId 
-		irrespective of onClick on trash icon so, pass note id to delete as a parameter to deleteNote 
-		function
+	*	Event bubbling occurs as thier is onClick property on each Note element and delete icon as well, 
+		and to stop its eventListener we use event.stopPropagation().
 
-	
-	function deleteNote(event, noteId) {
-		event.stopPropagation();
-		setNotes((oldNotes) => oldNotes.filter((note) => note.id !== noteId));
-	}
+		function deleteNote(event, noteId) {
+			event.stopPropagation();
+			setNotes((oldNotes) => oldNotes.filter((note) => note.id !== noteId));
+		}
 
 	*/
-
-	// not manually setting up notes state !
-	async function deleteNote(noteId) {
-		// to delete to something from firestore, first get its ref
-		// 1 instance of database {db}
-		// 2 name of collection
-		// 3 id of document to delete
-		const docRef = doc(db, "notes", noteId); // return documentRef
-		await deleteDoc(docRef); // returns a promise
-	}
 
 	return (
 		<main>
 			{notes.length > 0 ? (
 				<Split sizes={[30, 70]} direction="horizontal" className="split">
 					<Sidebar
-						notes={notes}
-						currentNote={currentNote}
-						setCurrentNoteId={setCurrentNoteId}
-						newNote={createNewNote}
-						deleteNote={deleteNote}
+						notes={sortedNotes} // display all notes in the editor
+						currentNote={currentNote} // check which note is current active note
+						setCurrentNoteId={setCurrentNoteId} // ref of editor note with sidebar note
+						createNewNote={createNewNote} // create new note
+						deleteNote={deleteNote} // delete a note
 					/>
-					{currentNoteId && notes.length > 0 && (
-						<Editor currentNote={currentNote} updateNote={updateNote} />
-					)}
+					{
+						<Editor
+							tempNoteText={tempNoteText}
+							setTempNoteText={setTempNoteText}
+						/>
+					}
 				</Split>
 			) : (
 				<div className="no-notes">
